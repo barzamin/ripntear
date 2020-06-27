@@ -168,10 +168,10 @@ pub fn decode_instruction_from_stream(buf: &[u8]) -> (usize, Instruction) {
         [0b00_00_0010, ..] => (1, Stax { ptr: RegisterPair::BC }),
         [0b00_01_0010, ..] => (1, Stax { ptr: RegisterPair::DE }),
 
-        // SHLD: 00101010 lb hb
-        // LHLD: 00100010 lb hb
-        [0b0010_1_010, lo, hi, ..] => (3, Shld { addr: lohi(lo, hi) }),
-        [0b0010_0_010, lo, hi, ..] => (3, Lhld { addr: lohi(lo, hi) }),
+        // SHLD: 00100010 lb hb
+        // LHLD: 00101010 lb hb
+        [0b0010_0_010, lo, hi, ..] => (3, Shld { addr: lohi(lo, hi) }),
+        [0b0010_1_010, lo, hi, ..] => (3, Lhld { addr: lohi(lo, hi) }),
 
         // STA: 00110010 lb hb
         // LDA: 00111010 lb hb
