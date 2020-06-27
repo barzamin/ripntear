@@ -1,6 +1,6 @@
 use std::fs;
 use anyhow::Result;
-use ripntear::i8051::Instruction;
+use ripntear::i8085::Instruction;
 use structopt::StructOpt;
 use std::path::PathBuf;
 
