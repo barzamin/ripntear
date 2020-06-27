@@ -110,7 +110,7 @@ pub enum Instruction {
     Pchl,
     Sphl,
 
-    Rst { vector: u8 },
+    Rst { index: u8 },
 
     Dsub,
     Arhl,
@@ -471,14 +471,14 @@ impl Instruction {
             [0b11111001, ..] => (1, Sphl),
 
             // RST: 11vvv111
-            [0b11_000_111, ..] => (1, Rst { vector: 0 }),
-            [0b11_001_111, ..] => (1, Rst { vector: 1 }),
-            [0b11_010_111, ..] => (1, Rst { vector: 2 }),
-            [0b11_011_111, ..] => (1, Rst { vector: 3 }),
-            [0b11_100_111, ..] => (1, Rst { vector: 4 }),
-            [0b11_101_111, ..] => (1, Rst { vector: 5 }),
-            [0b11_110_111, ..] => (1, Rst { vector: 6 }),
-            [0b11_111_111, ..] => (1, Rst { vector: 7 }),
+            [0b11_000_111, ..] => (1, Rst { index: 0 }),
+            [0b11_001_111, ..] => (1, Rst { index: 1 }),
+            [0b11_010_111, ..] => (1, Rst { index: 2 }),
+            [0b11_011_111, ..] => (1, Rst { index: 3 }),
+            [0b11_100_111, ..] => (1, Rst { index: 4 }),
+            [0b11_101_111, ..] => (1, Rst { index: 5 }),
+            [0b11_110_111, ..] => (1, Rst { index: 6 }),
+            [0b11_111_111, ..] => (1, Rst { index: 7 }),
 
             [0x10, ..] => (1, Arhl),
 
