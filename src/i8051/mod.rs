@@ -494,6 +494,7 @@ pub fn decode_instruction_from_stream(buf: &[u8]) -> (usize, Instruction) {
         [0xfd, lo, hi, ..] => (3, Jk  { addr: lohi(lo, hi) }),
 
         _ => {
+            eprintln!("FAILED TO PARSE: {:x?}", buf.iter().take(3).collect::<Vec<_>>());
             todo!();
         }
     };
