@@ -1,14 +1,22 @@
 use std::fs;
 use anyhow::Result;
-use ripntear::i8051::decode_instruction_from_stream;
+use ripntear::i8051::Instruction;
+use structopt::StructOpt;
+use std::path::PathBuf;
+
+#[derive(Debug, StructOpt)]
+struct Opt {
+    #[structopt(name = "FILE", parse(from_os_str))]
+    file: PathBuf,
+}
 
 fn main() -> Result<()> {
-	let rom = fs::read("testdata/8085EXER.COM")?;
-    // let rom = vec![0x03, 0x13, 0x23, 0x33];
+    let opt = Opt::from_args();
+	let rom = fs::read(opt.file)?;
     let mut i = 0;
-    loop {
-        let (cnt, inst) = decode_instruction_from_stream(&rom[i..]);
-        println!("{:x}: {:x?}", i, inst);
+    while i < rom.len() {
+        let (cnt, inst) = Instruction::from_buf(&rom[i..]);
+        println!("${:04x}   {:x?}    {:x?}", i, &rom[i..i+cnt], inst);
         i += cnt;
     }
 
