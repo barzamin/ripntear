@@ -1,3 +1,4 @@
+use std::fmt;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 
 #[derive(Debug, IntoPrimitive, TryFromPrimitive)]
@@ -37,11 +38,58 @@ pub enum ConditionCodes {
     M = 0b111,
 }
 
+impl fmt::Display for RegisterPair {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        use RegisterPair::*;
+        match self {
+            BC => write!(f, "bc"),
+            DE => write!(f, "de"),
+            HL => write!(f, "hl"),
+            SP => write!(f, "sp"),
+            PSW => write!(f, "psw"),
+        }
+    }
+}
+
+impl fmt::Display for Register {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        use Register::*;
+        match self {
+            A => write!(f, "a"),
+            B => write!(f, "b"),
+            C => write!(f, "c"),
+            D => write!(f, "d"),
+            E => write!(f, "e"),
+            H => write!(f, "h"),
+            L => write!(f, "l"),
+            Mem => write!(f, "m"),
+        }
+    }
+}
+
+impl fmt::Display for ConditionCodes {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        use ConditionCodes::*;
+        match self {
+            NZ => write!(f, "nz"),
+            Z => write!(f, "z"),
+            NC => write!(f, "nc"),
+            C => write!(f, "c"),
+            PO => write!(f, "po"),
+            PE => write!(f, "pe"),
+            P => write!(f, "p"),
+            M => write!(f, "m"),
+        }
+    }
+}
+
+
 #[derive(Debug)]
 pub enum Instruction {
     Nop,
     Hlt,
-    Lxi { to: RegisterPair, value: u16 },
+
+    Lxi { reg: RegisterPair, value: u16 },
 
     Stax { ptr: RegisterPair },
     Ldax { ptr: RegisterPair },
@@ -160,10 +208,10 @@ impl Instruction {
             [0b1101_0_011, port, ..] => (2, Out { port }),
 
             // LXI: 00RP0001
-            [0b00_00_0001, lo, hi, ..] => (3, Lxi { to: RegisterPair::BC, value: lohi(lo, hi) }),
-            [0b00_01_0001, lo, hi, ..] => (3, Lxi { to: RegisterPair::DE, value: lohi(lo, hi) }),
-            [0b00_10_0001, lo, hi, ..] => (3, Lxi { to: RegisterPair::HL, value: lohi(lo, hi) }),
-            [0b00_11_0001, lo, hi, ..] => (3, Lxi { to: RegisterPair::SP, value: lohi(lo, hi) }),
+            [0b00_00_0001, lo, hi, ..] => (3, Lxi { reg: RegisterPair::BC, value: lohi(lo, hi) }),
+            [0b00_01_0001, lo, hi, ..] => (3, Lxi { reg: RegisterPair::DE, value: lohi(lo, hi) }),
+            [0b00_10_0001, lo, hi, ..] => (3, Lxi { reg: RegisterPair::HL, value: lohi(lo, hi) }),
+            [0b00_11_0001, lo, hi, ..] => (3, Lxi { reg: RegisterPair::SP, value: lohi(lo, hi) }),
 
             // STAX: 00RP0010
             [0b00_00_0010, ..] => (1, Stax { ptr: RegisterPair::BC }),
@@ -501,5 +549,105 @@ impl Instruction {
         };
 
         (count, instr)
+    }
+
+    pub fn raw_asm(&self) -> String {
+        use Instruction::*;
+        match self {
+            Nop => format!("nop"),
+            Hlt => format!("hlt"),
+            Xthl => format!("xthl"),
+            Xchg => format!("xchg"),
+            Pchl => format!("pchl"),
+            Sphl => format!("sphl"),
+
+            Rst {index} => format!("rst {:#x}", index),
+            Rstv => format!("rstv"),
+
+            Dsub => format!("dsub"),
+            Arhl => format!("arhl"),
+            Rdel => format!("rdel"),
+            Shlx => format!("shlx"),
+            Lhlx => format!("lhlx"),
+
+            Rlc => format!("rlc"),
+            Ral => format!("ral"),
+            Rrc => format!("rrc"),
+            Rar => format!("rar"),
+            Ei => format!("ei"),
+            Di => format!("di"),
+
+            Daa => format!("daa"),
+            Stc => format!("stc"),
+            Cma => format!("cma"),
+            Cmc => format!("cmc"),
+            Rim => format!("rim"),
+            Sim => format!("sim"),
+
+            Ldhi { imm } => format!("ldhi {:#x}", imm),
+            Ldsi { imm } => format!("ldsi {:#x}", imm),
+
+            Jnk { addr } => format!("jnk {:#x}", addr),
+            Jk { addr } => format!("jk {:#x}", addr),
+
+            Mov { src, dest } => format!("mov {}, {}", dest, src),
+
+            Adi { value } => format!("adi {:#x}", value),
+            Aci { value } => format!("aci {:#x}", value),
+            Sui { value } => format!("sui {:#x}", value),
+            Sbi { value } => format!("sbi {:#x}", value),
+            Ani { value } => format!("ani {:#x}", value),
+            Ori { value } => format!("ori {:#x}", value),
+            Xri { value } => format!("xri {:#x}", value),
+            Cpi { value } => format!("cpi {:#x}", value),
+
+            Add { reg } => format!("add {}", reg),
+            Adc { reg } => format!("adc {}", reg),
+            Sub { reg } => format!("sub {}", reg),
+            Sbb { reg } => format!("sbb {}", reg),
+            Ana { reg } => format!("ana {}", reg),
+            Ora { reg } => format!("ora {}", reg),
+            Xra { reg } => format!("xra {}", reg),
+            Cmp { reg } => format!("cmp {}", reg),
+
+            Pop { reg_pair } => format!("pop {}", reg_pair),
+            Push { reg_pair } => format!("push {}", reg_pair),
+
+            Stax { ptr } => format!("stax {}", ptr),
+            Ldax { ptr } => format!("ldax {}", ptr),
+
+            Inx { reg_pair } => format!("inx {}", reg_pair),
+            Dcx { reg_pair } => format!("dcx {}", reg_pair),
+
+
+            Inr { reg } => format!("inr {}", reg),
+            Dcr { reg } => format!("dcr {}", reg),
+
+            Lxi { reg, value } => format!("lxi {}, {:#x}", reg, value),
+            Mvi { reg, value } => format!("mvi {}, {:#x}", reg, value),
+
+            Dad { reg_pair } => format!("dad {}", reg_pair),
+
+            In { port } => format!("in {:#x}", port),
+            Out { port } => format!("out {:#x}", port),
+
+            Lda { addr } => format!("lda {:#x}", addr),
+            Sta { addr } => format!("sta {:#x}", addr),
+            Lhld { addr } => format!("lhld {:#x}", addr),
+            Shld { addr } => format!("shld {:#x}", addr),
+
+            Jmp { addr, condition } => match condition {
+                None => format!("jmp {:#x}", addr),
+                Some(cond) => format!("j{} {:#x}", cond, addr),
+            },
+            Call { addr, condition } => match condition {
+                None => format!("call {:#x}", addr),
+                Some(cond) => format!("c{} {:#x}", cond, addr),
+            },
+            Ret { condition } => match condition {
+                None => format!("ret"),
+                Some(cond) => format!("r{}", cond),
+            },
+        }
     }
 }

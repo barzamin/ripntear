@@ -16,7 +16,7 @@ fn main() -> Result<()> {
     let mut i = 0;
     while i < rom.len() {
         let (cnt, inst) = Instruction::from_buf(&rom[i..]);
-        println!("${:04x}   {:x?}    {:x?}", i, &rom[i..i+cnt], inst);
+        println!("${:04x}   {:x?}    {}", i, &rom[i..i+cnt], inst.raw_asm());
         i += cnt;
     }
 
