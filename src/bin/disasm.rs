@@ -8,6 +8,9 @@ use std::path::PathBuf;
 struct Opt {
     #[structopt(name = "FILE", parse(from_os_str))]
     file: PathBuf,
+
+    #[structopt(short, long)]
+    raw: bool,
 }
 
 fn main() -> Result<()> {
@@ -16,7 +19,11 @@ fn main() -> Result<()> {
     let mut i = 0;
     while i < rom.len() {
         let (cnt, inst) = Instruction::from_buf(&rom[i..]);
-        println!("${:04x}   {:x?}    {}", i, &rom[i..i+cnt], inst.raw_asm());
+        if !opt.raw {
+            println!("${:04x}    {:x?}           {}", i, &rom[i..i+cnt], inst.raw_asm());
+        } else {
+            println!("{}", inst.raw_asm());
+        }
         i += cnt;
     }
 
