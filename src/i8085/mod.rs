@@ -180,7 +180,6 @@ fn lohi(lo: u8, hi: u8) -> u16 {
     ((hi as u16) << 8) | lo as u16
 }
 
-
 impl Instruction {
     pub fn from_buf(buf: &[u8]) -> (usize, Instruction) {
         use Instruction::*;
@@ -541,6 +540,8 @@ impl Instruction {
 
             [0xdd, lo, hi, ..] => (3, Jnk { addr: lohi(lo, hi) }),
             [0xfd, lo, hi, ..] => (3, Jk  { addr: lohi(lo, hi) }),
+
+            [0xcb, ..] => (1, Rstv),
 
             _ => {
                 eprintln!("FAILED TO PARSE: {:x?}", buf.iter().take(3).collect::<Vec<_>>());
