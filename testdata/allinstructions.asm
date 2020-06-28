@@ -148,8 +148,6 @@ stack:
 	pop d
 	pop h
 	pop psw
-xthl
-sphl
 mem:
 	lda 1337h
 	sta 1337h
