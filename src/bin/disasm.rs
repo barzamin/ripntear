@@ -1,6 +1,6 @@
 use std::fs;
 use anyhow::Result;
-use ripntear::i8085::Instruction;
+use ripntear::i8085;
 use structopt::StructOpt;
 use std::path::PathBuf;
 
@@ -18,7 +18,7 @@ fn main() -> Result<()> {
 	let rom = fs::read(opt.file)?;
     let mut i = 0;
     while i < rom.len() {
-        let (cnt, inst) = Instruction::from_buf(&rom[i..]);
+        let (cnt, inst) = i8085::Instruction::decode_one(&rom[i..]);
         if !opt.raw {
             println!("${:04x}    {:x?}           {}", i, &rom[i..i+cnt], inst.raw_asm());
         } else {
