@@ -1,5 +1,5 @@
 use bitflags::bitflags;
-use num_enum::{IntoPrimitive, TryFromPrimitive};
+use num_enum::TryFromPrimitive;
 use std::convert::TryFrom;
 // TODO: make (more) generic (ie, remove the PC-8300 specific parts)
 

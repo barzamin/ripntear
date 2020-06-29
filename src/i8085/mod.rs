@@ -1,5 +1,8 @@
 use std::fmt;
+use std::io::{self, Write};
 use num_enum::{IntoPrimitive, TryFromPrimitive};
+
+use crate::printer::Print;
 
 mod decode;
 mod trace;
@@ -279,5 +282,11 @@ impl Instruction {
                 Some(cond) => format!("r{}", cond),
             },
         }
+    }
+}
+
+impl Print for Instruction {
+    fn print<W>(&self, w: &mut W) -> io::Result<()> where W: Write {
+        write!(w, "{}", self.raw_asm())
     }
 }
