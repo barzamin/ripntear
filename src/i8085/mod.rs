@@ -3,6 +3,7 @@ use num_enum::{IntoPrimitive, TryFromPrimitive};
 
 mod decode;
 mod trace;
+mod memory;
 
 #[derive(Debug, IntoPrimitive, TryFromPrimitive)]
 #[repr(u8)]
